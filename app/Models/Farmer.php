@@ -19,6 +19,7 @@ class Farmer extends Model
         'city',
         'neighborhood',
         'street',
+        'status',
     ];
 
     public function user()

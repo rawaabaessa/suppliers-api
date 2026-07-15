@@ -34,4 +34,8 @@ class User extends Authenticatable
     {
     return $this->belongsTo(Role::class);
     }
+    public function farmer()
+{
+    return $this->hasOne(Farmer::class);
+}
 }

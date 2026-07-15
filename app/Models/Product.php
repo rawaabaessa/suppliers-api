@@ -18,6 +18,8 @@ class Product extends Model
         'category_id',
         'price',
         'min_order',
+        'image',
+        'quantity',
     ];
 
     public function farmer()
@@ -28,5 +30,9 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

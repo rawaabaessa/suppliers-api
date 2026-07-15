@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 
-class CategorySeeder extends Seeder
+class RoleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,11 +15,10 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
 
-        Category::insert([
-            ['name' => 'Vegetables'],
-            ['name' => 'Fruits'],
-            ['name' => 'Greens'],
-            ['name' => 'Herbs'],
+        Role::insert([
+            ['name' => 'admin'],
+            ['name' => 'farmer'],
+            ['name' => 'restaurant'],
         ]);
     }
 }

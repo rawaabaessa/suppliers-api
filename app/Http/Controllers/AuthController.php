@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankInfo;
+use App\Models\Farmer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
@@ -36,7 +38,7 @@ class AuthController extends Controller
         'email' => 'required|email',
         'password' => 'required',
         ]);
-        $user = User::with('role')
+        $user = User::with(['role', 'farmer'])
                         ->where('email', $request->email)
                         ->first();
 
@@ -62,5 +64,63 @@ public function logout(Request $request)
 public function me(Request $request)
 {
     return response()->json($request->user());
+}
+
+public function registerFarmer(Request $request)
+{
+    $validated = $request->validate([
+        // farm info
+        'farmName' => 'required|string',
+        'name' => 'required|string',
+        'email' => 'required|email|unique:users,email',
+        'phone' => 'required|string',
+        'password' => 'required|min:8',
+
+        // address
+        'city' => 'required|string',
+        'neighborhood' => 'required|string',
+        'street' => 'required|string',
+
+        // bank
+        'bankName' => 'required|string',
+        'accountHolderName' => 'required|string',
+        'iban' => 'required|string',
+    ]);
+
+    // 1. create user
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => bcrypt($validated['password']),
+        'role_id' => 2,
+    ]);
+
+    // 2. create farmer profile
+    $farmer = Farmer::create([
+        'user_id' => $user->id,
+        'farm_name' => $validated['farmName'],
+        'phone' => $validated['phone'],
+        'city' => $validated['city'],
+        'neighborhood' => $validated['neighborhood'],
+        'street' => $validated['street'],
+        'status' => 'pending',
+    ]);
+
+    // 3. bank info (إذا عندك جدول منفصل)
+    BankInfo::create([
+        'farmer_id' => $farmer->id,
+        'bank_name' => $validated['bankName'],
+        'account_holder_name' => $validated['accountHolderName'],
+        'iban' => $validated['iban'],
+    ]);
+
+    // 4. token
+    $token = $user->createToken('auth')->plainTextToken;
+
+    return response()->json([
+        'message' => 'Farmer registered successfully',
+        'user' => $user,
+        'token' => $token,
+    ]);
 }
 }
